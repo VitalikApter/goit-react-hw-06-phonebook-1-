@@ -1,16 +1,15 @@
+import PhoneBook from 'components/PhoneBook/PhoneBook';
+import configureStore from 'redux/configureStore';
+import { Provider } from 'react-redux';
+
 export const App = () => {
   return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 40,
-        color: '#010101'
-      }}
-    >
-      React homework template
-    </div>
+    <Provider store={configureStore}>
+      <div>
+        <PhoneBook />
+      </div>
+    </Provider>
   );
 };
+
+export default App;
