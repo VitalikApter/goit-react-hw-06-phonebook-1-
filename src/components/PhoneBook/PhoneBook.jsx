@@ -1,24 +1,29 @@
-import { useState } from 'react';
-
 import ContactsList from './ContactsList/ContactsList';
 import ContactsFilter from './ContactsFilter/ContactsFilter';
 import PhoneBookForm from './PhoneBookForm/PhoneBookForm';
 import { useSelector, useDispatch } from 'react-redux';
 import css from './PhoneBook.module.scss';
 
-import { addContact } from 'redux/actions';
+import { addContact, deleteContact } from 'redux/contacts/contacts-slice';
+import { setFilter } from 'redux/filter/filter-slice';
+
+import {
+  getAllContacts,
+  getFilterContacts,
+} from 'redux/contacts/contacts-selectors';
+import { getFilter } from 'redux/filter/filter-selectors';
 
 const PhoneBook = () => {
-  const contacts = useSelector(configureStore => configureStore.contacts);
-  const [filter, setFilter] = useState('');
+  const filteredContacts = useSelector(getFilterContacts);
+  const allContacts = useSelector(getAllContacts);
+  const filter = useSelector(getFilter);
 
   const dispatch = useDispatch();
 
-  
   const isDublicate = (name, number) => {
     const normalizedName = name.toLowerCase();
     const normalizedNumber = number.toLowerCase();
-    const contact = contacts.find(({ name, number }) => {
+    const contact = allContacts.find(({ name, number }) => {
       return (
         name.toLowerCase() === normalizedName ||
         number.toLowerCase() === normalizedNumber
@@ -34,32 +39,17 @@ const PhoneBook = () => {
       return false;
     }
 
-    const action = addContact({ name, number });
-    dispatch(action);
+    dispatch(addContact({ name, number }));
   };
 
-  // const removeContact = id => {
-  //   setContacts(prevContacts => prevContacts.filter(item => item.id !== id));
-  // };
-
-  const handleFilter = ({ target }) => setFilter(target.value);
-
-  const getFilteredContacts = () => {
-    if (!filter) {
-      return contacts;
-    }
-    const normalizedFilter = filter.toLowerCase();
-    const result = contacts.filter(({ name, number }) => {
-      return (
-        name.toLowerCase().includes(normalizedFilter) ||
-        number.includes(normalizedFilter)
-      );
-    });
-
-    return result;
+  const handleRemoveContact = id => {
+    dispatch(deleteContact(id));
   };
 
-  const filteredContacts = getFilteredContacts();
+  const handleFilter = ({ target }) => {
+    dispatch(setFilter(target.value));
+  };
+
   const isContacts = Boolean(filteredContacts.length);
   return (
     <>
@@ -68,8 +58,13 @@ const PhoneBook = () => {
           <h2 className={css.title}>Phonebook</h2>
           <PhoneBookForm onSubmit={handleAddContact} />
         </div>
-        <ContactsFilter handleChange={handleFilter} />
-        {isContacts && <ContactsList contacts={filteredContacts} />}
+        <ContactsFilter value={filter} handleChange={handleFilter} />
+        {isContacts && (
+          <ContactsList
+            removeContact={handleRemoveContact}
+            contacts={filteredContacts}
+          />
+        )}
         {!isContacts && <p>No Contacts</p>}
       </div>
     </>
