@@ -11,10 +11,9 @@ import './index.css';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={Store}>
-    <PersistGate loading={null} persistor={persistor}>
-    <App />
-    </PersistGate>
+      <PersistGate loading={null} persistor={persistor}>
+        <App />
+      </PersistGate>
     </Provider>
   </React.StrictMode>
 );
-
